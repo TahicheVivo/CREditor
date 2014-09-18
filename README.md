@@ -1,4 +1,0 @@
-CREditor
-========
-
-Editor XML
