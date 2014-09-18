@@ -112,15 +112,18 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 
 
 		$form->add_input('ID', array(
+		'wrap_class' => array('form_field_wrap id inline'),
 		'class'=>array("form-control id"),
 		'type' => 'select',
 		'options' => $idarr,
-		'selected' =>$idNodo
+		'selected' =>$idNodo,
+		//'name'
 		),
 		'id_'.$count
 		);
 		
 		$form->add_input('Título', array(
+		'wrap_class' => array('form_field_wrap titulo'),
 		'class'=>array("form-control titulo"),
 		'type' => 'textfield',
 		'value' => $value['Titulo']
@@ -129,6 +132,7 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		);
 		
 		$form->add_input('Texto', array(
+		'wrap_class' => array('form_field_wrap texto'),
 		'class'=>array("form-control texto"),
 		'type' => 'textarea',
 		'value' => htmlspecialchars_decode($value['Texto'])
@@ -136,6 +140,7 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		'Texto_'.$count
 		);
 		$form->add_input('Enlace', array(
+		'wrap_class' => array('form_field_wrap enlace'),
 		'class'=>array("form-control enlace"),
 		'type' => 'textfield',
 		'value' => $value['Enlace']
@@ -143,6 +148,7 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		'Enlace_'.$count
 		);
 		$form->add_input('TextoEnlace', array(
+		'wrap_class' => array('form_field_wrap textoenlace'),
 		'label'=>"Posibles imágenes para botón - TextoEnlace",
 		'class'=>array("form-control textoenlace"),
 		'type' => 'textfield',
@@ -152,6 +158,7 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		);
 		
 		$form->add_input('Imagen', array(
+		'wrap_class' => array('form_field_wrap'),
 		'label'=>"Imagen destacado",
 		'class'=>array("form-control imagen"),
 		'type' => 'textfield',
@@ -186,9 +193,8 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <link href="inc/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 		<script src="inc/bootstrap/js/bootstrap.min.js"></script>
-		
-		<script src="inc/jquery-ui.js"></script>
-		<link href="inc/jquery-ui.css" rel="stylesheet">
+		<script src="inc/jquery-ui/jquery-ui.js"></script>
+		<link href="inc/jquery-ui/jquery-ui.css" rel="stylesheet">
 		
 		
         <script type="text/javascript">
@@ -198,7 +204,9 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
                 $("#folderform").submit();
             });
             
-            $(".textoenlace").after( "<button class='btn btn-primary btn-sm' data-toggle='modal' data-target='#textoEnlaceModal'>Opciones Botones</button>" );
+            $('<span class="ui-icon ui-icon-arrowthick-2-n-s">kokook</span>').prependTo(".form-group.nodoxml");
+            
+            $(".form-control.textoenlace").after( "<button class='btn btn-primary btn-sm' data-toggle='modal' data-target='#textoEnlaceModal'>Opciones Botones</button>" );
 			
 			$(".form-control.imagen").after( "<a class='btn btn-primary btn-sm' target='_blank' href='image_destacados_generator.php'>Ir a imágenes</a>" );
 			
@@ -224,12 +232,18 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
         });
         </script>
         <style>
-	        .form-group.nodoxml{
-	        margin: 40px auto;
+        .ui-state-highlight { 
+        height: 200px; 
+        line-height: 1.2em; 
+        }
+        
+        	.form-group.nodoxml{
+	        margin: 20px auto;
 	        padding-bottom: 20px;
 	        /*border-bottom: 20px solid #aeaeae;*/
+	        border-top: 1px dotted #777777;
+			}
 		        
-	        }
 	        .form_field_wrap{
 		         margin: 10px auto;
 	        }
@@ -248,12 +262,52 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		        color: #333;
 		        display: block;
 		        width: 100%;
-		        padding: 10px;
+		        padding: 5px;
+		    }
+		      
+	        .form_field_wrap.inline label, .form_field_wrap.inline select, .form_field_wrap.inline textarea {
+	        display: inline-block;
+	        width: 80%;
+	        }
+	        .form_field_wrap.inline label{
+		        width: auto;
+		        margin-left: 20px;
+	        }
+	        .nodoxml .ui-icon{
+		    /* position: absolute;*/
+		    
 	        }
         </style>
     </head>
 
 <?php include("header.php") ?>
+
+<style>
+  #sortable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+  #sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; height: 18px; }
+  #sortable li span { position: absolute; margin-left: -1.3em; }
+  </style>
+  <script>
+  $(function() {
+    $( "#sortable,#sortableform > form" ).sortable({
+      placeholder: "ui-state-highlight",
+      opacity: 0.5,
+      update: function(event, ui) {
+                            var nodos = $(this).children(".nodoxml");
+                            $i=1;
+                            $(nodos).each(function(){
+	                            //console.log(this);
+	                            $(this).find(".form-control.id ").val($i);
+	                            $i++;
+                            });
+                        }
+    });
+    // $( "#sortable,#sortableform > form" ).disableSelection();
+  });
+  </script>
+</head>
+<body>
+
 
 <div class="container" >
 <div class="page-header">
@@ -268,12 +322,13 @@ XML: <?= $xmlDestino; ?>
 <?php endif ;?>
 </div>
 
-
+<div id="sortableform">
 <?php
 // generado por funcion antes
 echo $formulario;
 ?>
-              
+</div> 
+             
 </div><!-- fin container -->
 
 
