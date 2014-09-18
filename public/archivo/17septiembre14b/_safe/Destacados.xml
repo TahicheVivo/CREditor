@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Destacados noNamespaceSchemaLocation="Destacados.xsd">
+  <Destacado id="1">
+    <Titulo>Cruz Roja inicia su proceso electoral OEE</Titulo>
+    <Texto>Cruz Roja Española ha iniciado su proceso electoral 2014-2015.  Mediante este proceso, la institución renovará sus órganos de gobierno y los de asesoramiento y control para afrontar la legislatura 2015-2019. Infórmate en nuestro microsite sobre este proceso democrático y abierto en el que participarán más de 900.000 personas.</Texto>
+    <Imagen>img/destacados/15sept14/elecciones.jpg</Imagen>
+    <Enlace>http://www.cruzroja.es/elecciones/</Enlace>
+    <TextoEnlace>img/destacados/botonmasinfo.png</TextoEnlace>
+  </Destacado>
+  <Destacado id="2">
+    <Titulo>Centro de Tratamiento del Ébola en Sierra Leona</Titulo>
+    <Texto>Ya ha entrado en funcionamiento el Centro de Tratamiento de Ébola que Cruz Roja Española ha construido en las proximidades de la localidad de Kenema. El centro, que ocupa una superficie de 10.000 m2, tiene capacidad para 60 pacientes.</Texto>
+    <Imagen>img/destacados/17sept14/prepor_prepor2_16_09_hospital.jpg</Imagen>
+    <Enlace>http://prensacruzroja.es/cruz-roja-espanola-pone-en-marcha-un-centro-de-tratamiento-del-ebola-en-sierra-leona/</Enlace>
+    <TextoEnlace>img/destacados/botonmasinfo.png</TextoEnlace>
+  </Destacado>
+  <Destacado id="3">
+    <Titulo>Los primeros auxilios salvan vidas</Titulo>
+    <Texto>Tener conocimientos sobre primeros auxilios es fundamental para hacer frente a una situación de emergencia. De que actuemos con celeridad depende que las consecuencias de un accidente o una enfermedad repentina sean más o menos graves.</Texto>
+    <Imagen>img/destacados/12sept14/primeros_auxilios.jpg</Imagen>
+    <Enlace>http://prensacruzroja.es/la-poblacion-local-salva-el-90-de-las-vidas-cuando-ocurre-un-desastre/</Enlace>
+    <TextoEnlace>img/destacados/botonmasinfo.png</TextoEnlace>
+  </Destacado>
+  <Destacado id="4">
+    <Titulo>Ayuda Territorios Palestinos</Titulo>
+    <Texto>Necesitamos de tu solidaridad para paliar la dramática situación en Palestina. Cruz Roja ha dispuesto ayuda de emergencia humanitaria urgente destinada a los damnificados en el conflicto.</Texto>
+    <Imagen>img/destacados/17sept14/prepor_prepor_1_14_07_gaza.jpg</Imagen>
+    <Enlace>https://www.cruzroja.es/webCre/donativos/donativos.php?llamada=2.9.85.13860.24/05/04.2.13860</Enlace>
+    <TextoEnlace>img/destacados/botondonaaqui.png</TextoEnlace>
+  </Destacado>
+  <Destacado id="5">
+    <Titulo>150 Aniversario de Cruz Roja Española</Titulo>
+    <Texto>Hemos cumplido 150 años cerca de las personas, 150 años de trabajo, de voluntariado, de apoyo... ...Pero la historia no acaba aquí, ¡tú eres el relevo!</Texto>
+    <Imagen>img/destacados/20junio14/prepor_150.jpg</Imagen>
+    <Enlace>http://www.cruzroja.tv/index.php?MetaDataID=833618</Enlace>
+    <TextoEnlace>img/destacados/botonmasinfo.png</TextoEnlace>
+  </Destacado>
+  <Destacado id="6">
+    <Titulo>Ahora + que nunca</Titulo>
+    <Texto>La distribución de alimentos es una de las acciones más importantes del Llamamiento de Ayuda lanzado por Cruz Roja Española (?Ahora + que nunca?) con el fin de incrementar su apoyo a las personas afectadas por la crisis en nuestro país y atender a más personas en situación de extrema vulnerabilidad. Recientemente, el llamamiento se ha prolongado hasta 2015.</Texto>
+    <Imagen>img/destacados/3sept14/prepor_llamamiento.jpg</Imagen>
+    <Enlace>https://www.cruzroja.es/webCre/donativos/donativos.php?llamada=2.59.121.13860.24/05/04.2.13860</Enlace>
+    <TextoEnlace>img/destacados/botondonaaqui.png</TextoEnlace>
+  </Destacado>
+</Destacados>
