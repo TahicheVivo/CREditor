@@ -2,29 +2,33 @@
 session_start();
 $root_path = realpath( dirname( __FILE__ ) ) . '/';
 include_once( $root_path . '../libs/krumo/class.krumo.php');
-include_once( $root_path . '../libs/Images.php' );
+include_once( $root_path . 'lib/Images.php' );
 $message="";
 $nextPaso="CR_form2.php";
 // variables para el form
 setlocale(LC_ALL, 'es_ES');
 $todayFolder=strftime("%d%B%y");
-
+$existeXMLDestacados=false;
 // krumo($_POST);
 if(!isset($_SESSION['workfolder_webdir']) || !is_dir($_SESSION['workfolder_webdir'])){
 	$message = "Necesitas crear carpeta para xml e imágenes";
 }
 else{
 	$xmlDestino=$_SESSION['workfolder_webdir']."Destacados.xml";
-    $fp = @fopen($xmlDestino, 'w');
+    $fp = @fopen($xmlDestino, 'r');
     if($fp){
-    $message= "Existe directorio {$_SESSION['workfolder_webdir']} y XML <a href='{$nextPaso}'>Próximo paso</a>";
+    $existeXMLDestacados=$xmlDestino;
+    $message= "Existe directorio {$_SESSION['workfolder_webdir']} y <a href='{$existeXMLDestacados}' target='_blank'>XML</a> ---> <a href='{$nextPaso}'>Próximo paso</a>";
     fclose($fp);
     }
 }
 
 if(isset($_POST['folder'])){
 $folder="archivo/".$_POST['folder']."/web/";
+
+
 $_SESSION['workfolder']=$_POST['folder'];
+
 $todayFolder=$_SESSION['workfolder'];
 
 $_SESSION['workfolder_webdir']=$folder;
@@ -81,10 +85,10 @@ fwrite($fp, $out);
 fclose($fp);
 
 
-   $message .= "<h2>Archivo {$xmlDestino} creado</h2>";
+   $message .= "<h2>Archivo <a href='{$xmlDestino}' target='_blank'>{$xmlDestino}</a> creado</h2>";
     $message.= "<a href='{$nextPaso}'>Próximo paso</a>";
     
-   $message.=krumo(file_get_contents($xmlDestino));
+   // $message.=krumo(file_get_contents($xmlDestino));
    
    
 }
@@ -99,10 +103,9 @@ fclose($fp);
     <head>
         <meta charset="utf-8">
         <title>CruzRoja XML</title>
-        <link href="inc/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<script src="inc/bootstrap/js/bootstrap.min.js"></script>
+		
+		<?php include("header.php") ?>
 
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script type="text/javascript">
         jQuery(document).ready(function($){
            
@@ -113,12 +116,21 @@ fclose($fp);
             $("#resetcarpeta").click(function() {
                 $("#folder").val('<?php echo $todayFolder ?>');
             });
+			
+			<?php 
+			// si ya existe advertimos de que se sobreescribirá
+			if ($existeXMLDestacados):?>
+			
+			 $("#botimportXML").click(function() {
+				 return confirm('Ya existe un XML importado \n "<?php echo $existeXMLDestacados;?>" \n Esto lo sobreescribirá y los cambios se perderán.\n ¿Seguro?');
+            });
 
+			<?php endif; ?>
             
         });
         </script>
 
-<?php include("header.php") ?>
+
 
 <div class="container" >
 <div class="page-header">
@@ -149,7 +161,7 @@ if (isset($_SESSION['workfolder'])):
 <form id="importXML" method="post" action='<?php echo $_SERVER['PHP_SELF'];?>'>
 <div class="row">
 <h3>Importar XML </h3>http://cruzroja.vivocomtech.net/Destacados.xml
-<input type="submit" name="botimportXML" class="btn btn-success btn-large" value="Importar XML"></input>
+<input type="submit" id="botimportXML" name="botimportXML" class="btn btn-success btn-large" value="Importar XML"></input>
 <input type="hidden" name="importXML" />
 </div>
 </form>

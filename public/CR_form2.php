@@ -2,12 +2,13 @@
 session_start();
 $root_path = realpath( dirname( __FILE__ ) ) . '/';
 include_once( $root_path . '../libs/krumo/class.krumo.php');
-include_once( $root_path . '../libs/Images.php' );
 include_once ($root_path . '../libs/Array2XML.php');
 include_once ($root_path . '../libs/XML2Array.php');
 include_once($root_path . '../libs/php-form-builder/PhpFormBuilder.php');
-
+include_once( $root_path . 'lib/Images.php' );
 //krumo($_SESSION);
+
+$remoteURL = "http://cruzroja.vivocomtech.net";
 
 $message="";
 $nextPaso="CR_form2.php";
@@ -22,23 +23,27 @@ $xmlDestino=$_SESSION['workfolder_webdir']."Destacados.xml";
 //krumo($xmlDestino);
 
 //si hemos post, guardo el nuevo XML con los datos
-if($_SERVER['REQUEST_METHOD'] == "POST"  && isset($_POST['numerocampos']) ){
-	//krumo($_POST);
+if($_SERVER['REQUEST_METHOD'] == "POST"  && isset($_POST['id']) ){
+	$errores=array();
 	$destacadosArrForm=array();
 	$campos=array(
+		"id",
 		"Titulo",
 		"Texto",
 		"Imagen",
 		"Enlace",
 		"TextoEnlace"
 		);
-		
-	for($i=1; $i<(int)($_POST['numerocampos']+1);$i++){
+	
+	// $errores[]="Quitar esto en linea 38 para que guarde el archivo";
+	
+	for($i=0; $i<(int)(count($_POST['id']));$i++){
 		$nodo=array();
 		foreach($campos as $x=>$val){
-			$nodo[$val]=$_POST[$val."_".$i];
+			$nodo[$val]=$_POST[$val][$i];
+			if(!$nodo[$val] || empty($nodo[$val])) $errores[]="No value for ".$val." ".$i;
 		}
-		$nodo["@attributes"]=array("id"=>$_POST["id_".$i]);
+		$nodo["@attributes"]=array("id"=>$_POST['id'][$i]);
 		$destacadosArrForm[]=$nodo;
 		//krumo($nodo);
 	}
@@ -48,16 +53,18 @@ if($_SERVER['REQUEST_METHOD'] == "POST"  && isset($_POST['numerocampos']) ){
 	"@attributes"=>array("noNamespaceSchemaLocation"=>"Destacados.xsd"))
 	);
 	//krumo($Destacados);	
-	
+	if(empty($errores)){
 	$Array2XML= Array2XML::init( '1.0', 'iso-8859-1');
 	$outputDestXML = Array2XML::createXML('Destacados', $Destacados);
 	$xmlString=$outputDestXML->saveXML();
 	$xmlString=utf8_encode($xmlString);
 	
-	$xmlDestino2=$_SESSION['workfolder_webdir']."Destacados.xml";
-	$fp = fopen($xmlDestino2, 'w');
+	$xmlDestinoFile=$_SESSION['workfolder_webdir']."Destacados.xml";
+	$fp = fopen($xmlDestinoFile, 'w');
 	fwrite($fp, $xmlString);
 	fclose($fp);
+	}
+	else $message="<h3>Errores al parsear </h3>".implode("<br>",$errores);
 }
 
 
@@ -117,7 +124,7 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		'type' => 'select',
 		'options' => $idarr,
 		'selected' =>$idNodo,
-		//'name'
+		'name' => 'id[]'
 		),
 		'id_'.$count
 		);
@@ -126,7 +133,8 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		'wrap_class' => array('form_field_wrap titulo'),
 		'class'=>array("form-control titulo"),
 		'type' => 'textfield',
-		'value' => $value['Titulo']
+		'value' => $value['Titulo'],
+		'name'=>'Titulo[]'
 		),
 		'Titulo_'.$count
 		);
@@ -135,7 +143,8 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		'wrap_class' => array('form_field_wrap texto'),
 		'class'=>array("form-control texto"),
 		'type' => 'textarea',
-		'value' => htmlspecialchars_decode($value['Texto'])
+		'value' => htmlspecialchars_decode($value['Texto']),
+		'name'=>'Texto[]'
 		),
 		'Texto_'.$count
 		);
@@ -143,7 +152,8 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		'wrap_class' => array('form_field_wrap enlace'),
 		'class'=>array("form-control enlace"),
 		'type' => 'textfield',
-		'value' => $value['Enlace']
+		'value' => $value['Enlace'],
+		'name'=>'Enlace[]'
 		),
 		'Enlace_'.$count
 		);
@@ -152,7 +162,8 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		'label'=>"Posibles imágenes para botón - TextoEnlace",
 		'class'=>array("form-control textoenlace"),
 		'type' => 'textfield',
-		'value' => $value['TextoEnlace']
+		'value' => $value['TextoEnlace'],
+		'name'=>'TextoEnlace[]'
 		),
 		'TextoEnlace_'.$count
 		);
@@ -162,11 +173,12 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		'label'=>"Imagen destacado",
 		'class'=>array("form-control imagen"),
 		'type' => 'textfield',
-		'value' => $value['Imagen']
+		'value' => $value['Imagen'],
+		'name'=>'Imagen[]'
 		),
 		'Imagen_'.$count
 		);
-
+		
 
 		$form->add_input('</div>', array(
 		'type' => 'html'
@@ -182,6 +194,29 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 	return $out;
 
 }
+
+
+?>
+
+
+<?php
+// imagenes en la carpeta 
+function translatePathToRelIMG($imgpath){
+    // krumo($imgpath);
+	 $newPath =  explode("/web/",$imgpath)[1];
+	 return $newPath;
+    }
+// pintamos las imágenes disponibles
+$images=findFiles($_SESSION['destacados_img_folder'], $ext=array("png","gif","jpg"));
+$_SESSION['folderimages']=$images;
+
+$availableImgs="";
+		foreach($images as $path){
+		$relPath=translatePathToRelIMG($path);
+			$availableImgs.= "<div  style='width:200px;display: inline-block;margin:0 10px'>";
+			$availableImgs.="<a class='destthumb' href='#' data-relimg-url='{$relPath}' data-img-url='{$path}'><img  width='200' height='auto' src='{$path}' /></a>"; 
+			$availableImgs.= "<div style='word-break:break-all;font-size:11px'>{$path}</div></div>";
+		}
 ?>
 
 
@@ -190,14 +225,28 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
         <title>CruzRoja XML Paso2</title>
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-        <link href="inc/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<script src="inc/bootstrap/js/bootstrap.min.js"></script>
-		<script src="inc/jquery-ui/jquery-ui.js"></script>
-		<link href="inc/jquery-ui/jquery-ui.css" rel="stylesheet">
-		
+
+		<?php include("header.php") ?>
 		
         <script type="text/javascript">
+        
+        // imagenes en carpeta para ver si la imagen del xml existe en la carpeta o en servidor
+        var imagesinfolder=<?php echo json_encode($_SESSION['folderimages']); ?>;
+        console.log(imagesinfolder);
+        
+        
+        // funcion para escribir url remota a partir del valor del xml si es una imagen existente en servidor, no de las qu ehemos subido
+        function estaEnCarpeta(path){
+        // nos llega una url tipo img/destacados/18septiembre14/xxx.jpg
+        // miramos si existe en el array de archivos en carpeta, sino existe es externo (servidor)
+	    //console.log("----"+path);
+	    	for (var i = 0, len = imagesinfolder.length; i < len; i++){
+		    	if((imagesinfolder[i].indexOf(path) > -1)) return true;
+	    	}
+	         
+	        return false;
+        }
+        
         jQuery(document).ready(function($){
            
             $("#cambiarcarpeta").click(function() {
@@ -208,8 +257,7 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
             
             $(".form-control.textoenlace").after( "<button class='btn btn-primary btn-sm' data-toggle='modal' data-target='#textoEnlaceModal'>Opciones Botones</button>" );
 			
-			$(".form-control.imagen").after( "<a class='btn btn-primary btn-sm' target='_blank' href='image_destacados_generator.php'>Ir a imágenes</a>" );
-			
+			/*$(".form-control.imagen").after( "<a class='btn btn-primary btn-sm' target='_blank' href='image_destacados_generator.php'>Ir a imágenes</a>" );*/
 			
 			
 			var accordionPPio = $(".form-control.texto ")
@@ -219,7 +267,45 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 				$(this).before('<h4 class="colapsa"><a data-toggle="collapse" data-target="#collapse'+i+'"><span class="glyphicon glyphicon-circle-arrow-down"></span></a></h4>');
 				$(this).nextAll().andSelf().slice( 0,4 ).wrapAll('<div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"></div></div>');
 			});
+			
+			$(".form-control.imagen").after( "<button class='btn btn-primary btn-sm imagePopBt' data-toggle='modal' data-target='#imagesModal'>Imágenes >> </button>" );
+			
+			// container para imagen...
+			$(".form-control.imagen").after( "<img style='cursor:pointer'  href='#imgDetalleModal' data-toggle='modal'  class='thumblink' width='200' height='auto' src=' ' /><div class='textosubimagen'>YUuyuyuy</div>'" );	
+			
+						
+			$('.thumblink').click(function (e) {
+				var title=$(this).attr('remote-src')?"Imagen remota - "+$(this).attr('remote-src'):"Imagen en carpeta - "+$(this).attr('src');
+				/*if($(this).attr('remote-src')) title=$(this).attr('remote-src');
+				else title="Imagen en carpeta - "+$(this).attr('src');*/
+				$('#imgDetalleModal img').attr('src', $(this).attr('src'));
+				$('#imgDetalleModal .modal-title').text(title);
+			});
+			
+			
+					
+			$(".form-control.imagen").on('input change',function(){
+           var folderImg="<?php echo $_SESSION['workfolder_webdir'] ?>"+$(this).val();
+           var encarpeta=estaEnCarpeta($(this).val());
+           // console.log(encarpeta);
+           if(encarpeta){
+           $(this).next('img').attr("src", folderImg);
+           $(this).next('img').next('.textosubimagen').text("En carpeta");
+           }
+           else{
+           var remoteImg="<?php echo $remoteURL ?>/"+$(this).val();
+	           $(this).next('img').attr("src", remoteImg);
+	           $(this).next('img').attr("remote-src", remoteImg);
+	           $(this).next('img').next('.textosubimagen').text("Remota");
+           }
+			});
+			
+			
+			$(".form-control.imagen").change();
 
+
+			$(':submit').addClass("btn btn-success btn-lg");
+			
 			/*<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
           Collapsible Group Item #2
         </a>*/
@@ -231,56 +317,10 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 			*/
         });
         </script>
-        <style>
-        .ui-state-highlight { 
-        height: 200px; 
-        line-height: 1.2em; 
-        }
         
-        	.form-group.nodoxml{
-	        margin: 20px auto;
-	        padding-bottom: 20px;
-	        /*border-bottom: 20px solid #aeaeae;*/
-	        border-top: 1px dotted #777777;
-			}
-		        
-	        .form_field_wrap{
-		         margin: 10px auto;
-	        }
-	        textarea.form-control{
-		        height: 120px;
-	        }
-	        .form-control.titulo{
-		        font-size: 2em;
-				height: 2em;
-	        }
-	        h4.colapsa{
-		        background-color:#e4e4e4;
-		        border-radius:20px;
-	        }
-	        h4.colapsa a{
-		        color: #333;
-		        display: block;
-		        width: 100%;
-		        padding: 5px;
-		    }
-		      
-	        .form_field_wrap.inline label, .form_field_wrap.inline select, .form_field_wrap.inline textarea {
-	        display: inline-block;
-	        width: 80%;
-	        }
-	        .form_field_wrap.inline label{
-		        width: auto;
-		        margin-left: 20px;
-	        }
-	        .nodoxml .ui-icon{
-		    /* position: absolute;*/
-		    
-	        }
-        </style>
     </head>
 
-<?php include("header.php") ?>
+
 
 <style>
   #sortable { list-style-type: none; margin: 0; padding: 0; width: 60%; }
@@ -290,6 +330,7 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
   <script>
   $(function() {
     $( "#sortable,#sortableform > form" ).sortable({
+      cursor: 'move',
       placeholder: "ui-state-highlight",
       opacity: 0.5,
       update: function(event, ui) {
@@ -355,6 +396,75 @@ img/destacados/botonvideo.png	</pre>
     </div>
   </div>
 </div>
+
+
+
+
+
+<script type="text/javascript">
+		var activeSelect=null;
+        jQuery(document).ready(function($){
+        // $(".form-control.imagen").
+        $(".imagePopBt").click(function(){
+        event.preventDefault(); 
+        activeSelect=$(this).prevAll(".form-control.imagen").first();
+        //$(this).prev(".form-control.imagen").css( "background", "yellow" );
+        $("#availableImgsPop .destthumb").click(function(){
+        	event.preventDefault(); 
+	        activeSelect.val($(this).attr('data-relimg-url'));
+	        activeSelect.change();
+	        $('#imagesModal').modal('hide');
+        });
+        });
+        
+        
+        
+        })
+</script>
+
+<!-- modal botones texto enlace -->
+<!-- Modal -->
+<div class="modal fade" id="imagesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Imágenes Destacados - <?= $_SESSION['workfolder']; ?></h4>
+      </div>
+      <div class="modal-body">
+      
+      <div  id='availableImgsPop'>
+<?= $availableImgs; ?>
+      </div>
+      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="imgDetalleModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog"  style="width:1020px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Titulo Imagen</h4>
+      </div>
+      <div class="modal-body">
+<img src="">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
     </body>
     </html>

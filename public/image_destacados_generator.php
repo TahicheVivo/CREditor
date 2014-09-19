@@ -1,7 +1,7 @@
 <?php
 session_start();
 $root_path = realpath( dirname( __FILE__ ) ) . '/';
-include_once( $root_path . '../libs/Images.php' );
+include_once( $root_path . 'lib/Images.php' );
 include_once( $root_path . '../libs/krumo/class.krumo.php');
 
 $paso1="CR_form1.php";
@@ -71,12 +71,12 @@ if (isset($_SESSION['user_id'])):?>
 			if($uploaded_img_size<(1048576*$upload_size_limit)) {
 				//store uploaded image temporarily in "temp" directory while resizing is performed
 				$tmp_img_name = "temp-".time().".".$ext;
-				//create the permanent filename with extension - using time() as filename will ensure a unique filename. Image will be converted to jpg (if it's in another format) so we set it to jpg here.
+				//create the permanent filename with extension
 				$final_img_name = $final_image_name.".jpg";
-				
+				krumo($final_img_name);
 				//set image thumbnail destination
 				$store_filename = $root_path.$path.$final_img_name;
-				
+				krumo($store_filename);
 				//put uploaded image in var
 				$uploaded_img = $_FILES['photoimg']['tmp_name'];
 				//move the image into the temp directory while we work with it
@@ -125,19 +125,21 @@ if (isset($_SESSION['user_id'])):?>
 	 $newPath =  explode("/web/",$imgpath)[1];
 	 return $newPath;
     }
-    
+    // en Images.pgp
+    $images=readImagesFolder();
+    //krumo($images);
     // pintamos las imágenes disponibles
-    if(isset($_SESSION['destacados_img_folder']) ){
-		$images = glob($_SESSION['destacados_img_folder'] . "{*.jpg,*.gif, *.png}", GLOB_BRACE);
+    $images=findFiles($_SESSION['destacados_img_folder'], $ext=array("png","gif","jpg"));
+    //krumo($images);
 		$availableImgs="";
-		
 		foreach($images as $path){
 		$relPath=translatePathToRelIMG($path);
+		
 			$availableImgs.= "<div style='width:200px;display: inline-block;margin:0 10px'>";
 			$availableImgs.="<a class='destthumb' href='#imgModal' data-toggle='modal' data-relimg-url='{$relPath}' data-img-url='{$path}'><img  width='200' height='auto' src='{$path}' /></a>"; 
 			$availableImgs.= "<div style='word-break:break-all;font-size:11px'>{$path}</div></div>";
 		}
-    }
+    
     ?>
     
     <!doctype html>
@@ -145,10 +147,8 @@ if (isset($_SESSION['user_id'])):?>
     <head>
         <meta charset="utf-8">
         <title>Upload Image</title>
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-        <link href="inc/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<script src="inc/bootstrap/js/bootstrap.min.js"></script>
-
+		
+		<?php include("header.php") ?>
         
         <script type="text/javascript">
         jQuery(document).ready(function($){
@@ -188,7 +188,7 @@ if (isset($_SESSION['user_id'])):?>
     
     <body>
 
-        <?php include("header.php") ?>
+        
         
         <div class="container" >
 <div class="page-header">

@@ -1,0 +1,74 @@
+submit{
+	
+}
+
+.ui-state-highlight { 
+        height: 200px; 
+        line-height: 1.2em; 
+        }
+        
+        	.form-group.nodoxml{
+	        margin: 20px auto;
+	        padding: 20px 10px;
+	        /*border-bottom: 20px solid #aeaeae;*/
+	        border: 1px solid #d6d6d6;	        border-top: 1px dotted #777777;
+	        border-bottom: 1px dotted #777777;
+	        position: relative;
+	        
+	        -webkit-box-shadow: -1px 0px 8px 0px rgba(0, 0, 0, 0.47);
+-moz-box-shadow:    -1px 0px 8px 0px rgba(0, 0, 0, 0.47);
+box-shadow:         -1px 0px 8px 0px rgba(0, 0, 0, 0.47);
+
+			}
+		        
+	        .form_field_wrap{
+		         margin: 10px auto;
+	        }
+	        textarea.form-control{
+		        height: 120px;
+	        }
+	        .form-control.titulo{
+		        font-size: 2em;
+				height: 2em;
+	        }
+	        h4.colapsa{
+
+		        /*background-color: #F7F7F7;*/
+				border-radius: 10px;
+				cursor: pointer;
+				-webkit-box-shadow: inset -1px 0px 8px 0px rgba(0, 0, 0, 0.1);
+-moz-box-shadow:    inset -1px 0px 8px 0px rgba(0, 0, 0, 0.1);
+box-shadow:         inset -1px 0px 8px 0px rgba(0, 0, 0, 0.1);
+	        }
+	        h4.colapsa a{
+		        color: #333;
+		        display: block;
+		        width: 100%;
+		        padding: 5px;
+		    }
+		      
+	        .form_field_wrap.inline label, .form_field_wrap.inline select, .form_field_wrap.inline textarea {
+	        display: inline-block;
+	        width: 80%;
+	        }
+	        .form_field_wrap.inline label{
+		        width: auto;
+		        margin-left: 20px;
+	        }
+	        .nodoxml .ui-icon{
+		     position: absolute;
+		     top:5px;
+		    
+	        }
+.form_field_wrap.id{
+	font-size: 0.9em !important;
+	display: inline-block;
+position: absolute;
+right: 10px;
+}
+
+.form_field_wrap.id select{
+	font-size: 0.9em !important;
+	height: auto;
+	width: auto;
+}
