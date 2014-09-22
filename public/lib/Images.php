@@ -1,10 +1,27 @@
 <?php
 // http://stackoverflow.com/questions/2637945/getting-relative-path-from-absolute-path-in-php
-/*
-The second argument is the file which the path is relative to. It's optional so you can get the relative path regardless the webpage your currently are. In order to use it with @Young or @Gordon example, because you want to know the relative path to $b from $a, you'll have to use
 
-getRelativePath($b, $a);
-*/
+
+/**
+ * URL Slug
+ * @param str $str
+ * @return str
+ */
+function url_slug($str)
+{	
+	#convert case to lower
+	$str = strtolower($str);
+	#remove special characters
+	$str = preg_replace('/[^a-zA-Z0-9]/i',' ', $str);
+	#remove white space characters from both side
+	$str = trim($str);
+	#remove double or more space repeats between words chunk
+	$str = preg_replace('/\s+/', ' ', $str);
+	#fill spaces with hyphens
+	$str = preg_replace('/\s+/', '-', $str);
+	return $str;
+}
+
 
 function imagecopymerge_alpha($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $pct){ 
         // creating a cut resource 
@@ -21,7 +38,11 @@ function imagecopymerge_alpha($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, 
     } 
 
 
+/*
+The second argument is the file which the path is relative to. It's optional so you can get the relative path regardless the webpage your currently are. In order to use it with @Young or @Gordon example, because you want to know the relative path to $b from $a, you'll have to use
 
+getRelativePath($b, $a);
+*/
 
 function getRelativePath($path, $from = __FILE__ )
 {

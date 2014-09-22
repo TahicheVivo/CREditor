@@ -29,17 +29,8 @@ $_SESSION['destacados_img_folder']=$destacados_img_folder;
 	$message .= "<br> {$destacados_img_folder} es la carpeta activa";
 
 }
-else{
-	
-}
 
 
-
-//for TESTING, we'll create a user_id session
-$_SESSION['user_id']=1;
-if (isset($_SESSION['user_id'])):?>
-
-	<?php
     if($_SERVER['REQUEST_METHOD'] == "POST") {
     
     $image = new Images();
@@ -72,8 +63,8 @@ if (isset($_SESSION['user_id'])):?>
 				//store uploaded image temporarily in "temp" directory while resizing is performed
 				$tmp_img_name = "temp-".time().".".$ext;
 				//create the permanent filename with extension
-				$final_img_name = $final_image_name.".jpg";
-				krumo($final_img_name);
+				$final_img_name = url_slug($final_image_name).".jpg";
+				//krumo($final_img_name);
 				//set image thumbnail destination
 				$store_filename = $root_path.$path.$final_img_name;
 				krumo($store_filename);
@@ -242,4 +233,3 @@ if (isset($_SESSION['user_id'])):?>
 
     </body>
     </html>
-<?php endif;?>
