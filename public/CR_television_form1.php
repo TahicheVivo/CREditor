@@ -4,22 +4,26 @@ $root_path = realpath( dirname( __FILE__ ) ) . '/';
 include_once( $root_path . '../libs/krumo/class.krumo.php');
 include_once( $root_path . 'lib/Images.php' );
 $message="";
-$nextPaso="CR_form2.php";
+$nextPaso="CR_television_form2.php";
 // variables para el form
 setlocale(LC_ALL, 'es_ES');
 $todayFolder=strftime("%d%B%y");
-$existeXMLDestacados=false;
+$existeXMLTelevision=false;
 // krumo($_POST);
 if(!isset($_SESSION['workfolder_webdir']) || !is_dir($_SESSION['workfolder_webdir'])){
 	$message = "Necesitas crear carpeta para xml e imágenes";
 }
 else{
-	$xmlDestino=$_SESSION['workfolder_webdir']."Destacados.xml";
+	$message= "Existe directorio {$_SESSION['workfolder_webdir']}";
+	$xmlDestino=$_SESSION['workfolder_webdir']."Television.xml";
     $fp = @fopen($xmlDestino, 'r');
     if($fp){
-    $existeXMLDestacados=$xmlDestino;
-    $message= "Existe directorio {$_SESSION['workfolder_webdir']} y <a href='{$existeXMLDestacados}' target='_blank'>XML</a> ---> <a href='{$nextPaso}'>Próximo paso</a>";
+    $existeXMLTelevision=$xmlDestino;
+    $message.=" y <a href='{$existeXMLTelevision}' target='_blank'>XML</a> ---> <a href='{$nextPaso}'>Próximo paso</a>";
     fclose($fp);
+    }
+    else{
+	    $message.=" <br>No existe el XML - {$xmlDestino} - Importar?";
     }
 }
 
@@ -32,9 +36,6 @@ $_SESSION['workfolder']=$_POST['folder'];
 $todayFolder=$_SESSION['workfolder'];
 
 $_SESSION['workfolder_webdir']=$folder;
-
-unset($_SESSION['destacados_img_folder']);
-unset($_SESSION['cruzrojatv_img_folder']);
 
 if (is_dir($folder)) {
 $message = "Carpeta '{$folder}' <b>ya existía</b>";
@@ -61,7 +62,7 @@ $message="";
 	// create a new cURL resource
 $ch = curl_init();
 // set URL and other appropriate options
-curl_setopt($ch, CURLOPT_URL, "http://cruzroja.vivocomtech.net/Destacados.xml");
+curl_setopt($ch, CURLOPT_URL, "http://cruzroja.vivocomtech.net/Television.xml");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
 curl_setopt($ch, CURLOPT_HEADER, 0);
 // grab URL and pass it to the browser
@@ -69,7 +70,7 @@ $out = curl_exec($ch);
 
 // close cURL resource, and free up system resources
 curl_close($ch);
-$xmlDestino=$_SESSION['workfolder_webdir']."Destacados.xml";
+$xmlDestino=$_SESSION['workfolder_webdir']."Television.xml";
 
 //krumo(mb_detect_encoding($out));
 
@@ -81,7 +82,7 @@ fclose($fp);
 $safeFolder=dirname($_SESSION['workfolder_webdir'])."/_safe/" ;
 if(!createPath($safeFolder) )$message .="No se puede crear _safe folder";
 //.strftime("%d%B%y")."
-$xmlDestinoSAFE=$safeFolder."Destacados.xml";
+$xmlDestinoSAFE=$safeFolder."Television.xml";
 
 $fp = fopen($xmlDestinoSAFE, 'w');
 fwrite($fp, $out);
@@ -98,14 +99,14 @@ fclose($fp);
 
 
        
-// http://cruzroja.vivocomtech.net/Destacados.xml
+// http://cruzroja.vivocomtech.net/Television.xml
 
 ?>
  <!doctype html>
     <html>
     <head>
         <meta charset="utf-8">
-        <title>CruzRoja XML</title>
+        <title>CruzRoja Television Noticias XML</title>
 		
 		<?php include("header.php") ?>
 
@@ -122,10 +123,10 @@ fclose($fp);
 			
 			<?php 
 			// si ya existe advertimos de que se sobreescribirá
-			if ($existeXMLDestacados):?>
+			if ($existeXMLTelevision):?>
 			
 			 $("#botimportXML").click(function() {
-				 return confirm('Ya existe un XML importado \n "<?php echo $existeXMLDestacados;?>" \n Esto lo sobreescribirá y los cambios se perderán.\n ¿Seguro?');
+				 return confirm('Ya existe un XML importado \n "<?php echo $existeXMLTelevision;?>" \n Esto lo sobreescribirá y los cambios se perderán.\n ¿Seguro?');
             });
 
 			<?php endif; ?>
@@ -137,7 +138,7 @@ fclose($fp);
 
 <div class="container" >
 <div class="page-header">
-<h1>Editor Cruz Roja - XML</h1>
+<h1>Editor Cruz Roja Television - XML</h1>
 <h2>Paso 1 - Carpeta e importar</h2>
 <?php if (!empty($message)):?>
 <div class="alert alert-warning" role="alert"><?php echo $message; ?></div>
@@ -163,12 +164,14 @@ if (isset($_SESSION['workfolder'])):
         
 <form id="importXML" method="post" action='<?php echo $_SERVER['PHP_SELF'];?>'>
 <div class="row">
-<h3>Importar XML </h3>http://cruzroja.vivocomtech.net/Destacados.xml
+<h3>Importar XML </h3>http://cruzroja.vivocomtech.net/Television.xml
 <input type="submit" id="botimportXML" name="botimportXML" class="btn btn-success btn-large" value="Importar XML"></input>
 <input type="hidden" name="importXML" />
 </div>
 </form>
 <?php endif; ?>         
+
+
 </div><!-- fin container -->
     </body>
     </html>

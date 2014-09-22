@@ -47,13 +47,13 @@ box-shadow:         inset -1px 0px 8px 0px rgba(0, 0, 0, 0.1);
 		        padding: 5px;
 		    }
 		      
-	        .form_field_wrap.inline label, .form_field_wrap.inline select, .form_field_wrap.inline textarea {
+	        .form_field_wrap.inline label, .form_field_wrap.inline select, .form_field_wrap.inline textarea, .form_field_wrap.inline input {
 	        display: inline-block;
 	        width: 80%;
 	        }
 	        .form_field_wrap.inline label{
 		        width: auto;
-		        margin-left: 20px;
+		       /* margin-left: 20px;*/
 	        }
 	        .nodoxml .ui-icon{
 		     position: absolute;

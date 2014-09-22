@@ -4,33 +4,33 @@
     <id>1</id>
     <Titulo>Cruz Roja inicia su proceso electoral</Titulo>
     <Texto>Cruz Roja Española ha iniciado su proceso electoral 2014-2015.  Mediante este proceso, la institución renovará sus órganos de gobierno y los de asesoramiento y control para afrontar la legislatura 2015-2019. Infórmate en nuestro microsite sobre este proceso democrático y abierto en el que participarán más de 900.000 personas.</Texto>
-    <Imagen>img/destacados/18septiembre14/6d1b9d0e3edb6abab49b3992302ac38b2ae5b6.jpg</Imagen>
+    <Imagen>img/destacados/15sept14/elecciones.jpg</Imagen>
     <Enlace>http://www.cruzroja.es/elecciones/</Enlace>
     <TextoEnlace>img/destacados/botonmasinfo.png</TextoEnlace>
   </Destacado>
   <Destacado id="2">
     <id>2</id>
+    <Titulo>Campaña Cruz Roja-UE de preparación para desastres</Titulo>
+    <Texto>Sociedades de la Cruz Roja europea (que incluyen a Cruz Roja Española) y la Unión Europea han lanzado una campaña conjunta para llamar la atención sobre la importancia de la preparación para desastres y el refuerzo de las capacidades de resistencia y recuperación de las comunidades más vulnerables a desastres.</Texto>
+    <Imagen>img/destacados/22septiembre14/imagen-campa-a-europea.jpg</Imagen>
+    <Enlace>http://prensacruzroja.es/los-desastres-naturales-son-cada-vez-mas-y-mas-fuertes-sociedades-europeas-de-la-cruz-roja-y-la-comision-europea-lanzan-una-campana-para-mejorar-la-preparacion-de-las-comunidades-antes-los-desastres/</Enlace>
+    <TextoEnlace>img/destacados/botonmasinfo.png</TextoEnlace>
+  </Destacado>
+  <Destacado id="3">
+    <id>3</id>
     <Titulo>Centro de Tratamiento del Ébola en Sierra Leona</Titulo>
     <Texto>Ya ha entrado en funcionamiento el Centro de Tratamiento de Ébola que Cruz Roja Española ha construido en las proximidades de la localidad de Kenema. El centro, que ocupa una superficie de 10.000 m2, tiene capacidad para 60 pacientes.</Texto>
     <Imagen>img/destacados/17sept14/prepor_prepor2_16_09_hospital.jpg</Imagen>
     <Enlace>http://prensacruzroja.es/cruz-roja-espanola-pone-en-marcha-un-centro-de-tratamiento-del-ebola-en-sierra-leona/</Enlace>
     <TextoEnlace>img/destacados/botonmasinfo.png</TextoEnlace>
   </Destacado>
-  <Destacado id="3">
-    <id>3</id>
+  <Destacado id="4">
+    <id>4</id>
     <Titulo>Los primeros auxilios salvan vidas</Titulo>
     <Texto>Tener conocimientos sobre primeros auxilios es fundamental para hacer frente a una situación de emergencia. De que actuemos con celeridad depende que las consecuencias de un accidente o una enfermedad repentina sean más o menos graves.</Texto>
     <Imagen>img/destacados/12sept14/primeros_auxilios.jpg</Imagen>
     <Enlace>http://prensacruzroja.es/la-poblacion-local-salva-el-90-de-las-vidas-cuando-ocurre-un-desastre/</Enlace>
     <TextoEnlace>img/destacados/botonmasinfo.png</TextoEnlace>
-  </Destacado>
-  <Destacado id="4">
-    <id>4</id>
-    <Titulo>Ayuda Territorios Palestinos</Titulo>
-    <Texto>Necesitamos de tu solidaridad para paliar la dramática situación en Palestina. Cruz Roja ha dispuesto ayuda de emergencia humanitaria urgente destinada a los damnificados en el conflicto.</Texto>
-    <Imagen>img/destacados/17sept14/prepor_prepor_1_14_07_gaza.jpg</Imagen>
-    <Enlace>https://www.cruzroja.es/webCre/donativos/donativos.php?llamada=2.9.85.13860.24/05/04.2.13860</Enlace>
-    <TextoEnlace>img/destacados/botondonaaqui.png</TextoEnlace>
   </Destacado>
   <Destacado id="5">
     <id>5</id>

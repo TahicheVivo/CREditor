@@ -7,7 +7,7 @@ include_once( $root_path . '../libs/krumo/class.krumo.php');
 $paso1="CR_form1.php";
 
 setlocale(LC_ALL, 'es_ES');
-$todayFolder=strftime("%d%B%y");
+$todayFolder=$_SESSION['workfolder']?$_SESSION['workfolder']:strftime("%d%B%y");
 
 if(!isset($_SESSION['workfolder_webdir'])){
 	$message = "Necesitas crear carpeta para xml e imágenes <a href='{$paso1}'>Paso 1</a>";
@@ -30,6 +30,11 @@ $_SESSION['destacados_img_folder']=$destacados_img_folder;
 
 }
 
+if(isset($_GET['delete'])){
+	//unset($_SESSION);
+	unlink($_GET['delete']);
+	header("Location:".$_SERVER['PHP_SELF']);
+}
 
     if($_SERVER['REQUEST_METHOD'] == "POST") {
     
@@ -38,7 +43,7 @@ $_SESSION['destacados_img_folder']=$destacados_img_folder;
     //$folder="archivo/".$_POST['folder']."/web/img/destacados/prepor_";
     $folder= $_SESSION['destacados_img_folder'];
        
-		//Upload limit size in megabytes
+		//Upload limit size in megabytes 
 		$upload_size_limit = 10;
 		//this is the image destination path
 		$path = $folder;
@@ -67,7 +72,6 @@ $_SESSION['destacados_img_folder']=$destacados_img_folder;
 				//krumo($final_img_name);
 				//set image thumbnail destination
 				$store_filename = $root_path.$path.$final_img_name;
-				krumo($store_filename);
 				//put uploaded image in var
 				$uploaded_img = $_FILES['photoimg']['tmp_name'];
 				//move the image into the temp directory while we work with it
@@ -117,7 +121,7 @@ $_SESSION['destacados_img_folder']=$destacados_img_folder;
 	 return $newPath;
     }
     // en Images.pgp
-    $images=readImagesFolder();
+    // $images=readImagesFolder();
     //krumo($images);
     // pintamos las imágenes disponibles
     $images=findFiles($_SESSION['destacados_img_folder'], $ext=array("png","gif","jpg"));
@@ -125,10 +129,11 @@ $_SESSION['destacados_img_folder']=$destacados_img_folder;
 		$availableImgs="";
 		foreach($images as $path){
 		$relPath=translatePathToRelIMG($path);
+		$deletepath=$_SERVER['PHP_SELF']."?delete=".$path;
 		
 			$availableImgs.= "<div style='width:200px;display: inline-block;margin:0 10px'>";
 			$availableImgs.="<a class='destthumb' href='#imgModal' data-toggle='modal' data-relimg-url='{$relPath}' data-img-url='{$path}'><img  width='200' height='auto' src='{$path}' /></a>"; 
-			$availableImgs.= "<div style='word-break:break-all;font-size:11px'>{$path}</div></div>";
+			$availableImgs.= "<div style='word-break:break-all;font-size:11px'>{$path}</div><a href='{$deletepath}'  onclick='return confirm(\"Borrar Imagen?\")'><span class='glyphicon glyphicon-remove ' style='color:red'></span></a></div>";
 		}
     
     ?>
@@ -184,6 +189,7 @@ $_SESSION['destacados_img_folder']=$destacados_img_folder;
         <div class="container" >
 <div class="page-header">
 <h1>Editor Cruz Roja - Imágenes Destacados</h1>
+<p>Imágenes 577 x 299 </p>
 <?php if (!empty($message)):?>
 <div class="alert alert-warning" role="alert"><?php echo $message; ?></div>
 <?php endif ;?>

@@ -14,25 +14,29 @@ $message="";
 $nextPaso="CR_form2.php";
 // variables para el form
 setlocale(LC_ALL, 'es_ES');
+$hoyFecha=strftime("%Y.%m.%d");
+
 
 if(!isset($_SESSION['workfolder_webdir'])){
 	$message = "Necesitas crear carpeta para xml e imágenes";
 }
-$xmlDestino=$_SESSION['workfolder_webdir']."Destacados.xml";
+$xmlDestino=$_SESSION['workfolder_webdir']."Television.xml";
 
 //krumo($xmlDestino);
 
 //si hemos post, guardo el nuevo XML con los datos
 if($_SERVER['REQUEST_METHOD'] == "POST"  && isset($_POST['id']) ){
+// krumo($_POST);
 	$errores=array();
-	$destacadosArrForm=array();
+	$TelevisionArrForm=array();
 	$campos=array(
 		"id",
 		"Titulo",
 		"Texto",
 		"Imagen",
 		"Enlace",
-		"TextoEnlace"
+		"Elid",
+		"Fecha"
 		);
 	
 	// $errores[]="Quitar esto en linea 38 para que guarde el archivo";
@@ -44,22 +48,23 @@ if($_SERVER['REQUEST_METHOD'] == "POST"  && isset($_POST['id']) ){
 			if(!$nodo[$val] || empty($nodo[$val])) $errores[]="No value for ".$val." ".$i;
 		}
 		$nodo["@attributes"]=array("id"=>$_POST['id'][$i]);
-		$destacadosArrForm[]=$nodo;
+		$TelevisionArrForm[]=$nodo;
 		//krumo($nodo);
 	}
-	$Destacados=array(
-	"Destacados"=>array(
-	"Destacado"=>$destacadosArrForm,
-	"@attributes"=>array("noNamespaceSchemaLocation"=>"Destacados.xsd"))
+	krumo($TelevisionArrForm);
+	$Television=array(
+	"Televisions"=>array(
+	"Television"=>$TelevisionArrForm,
+	"@attributes"=>array("noNamespaceSchemaLocation"=>"Televisions.xsd"))
 	);
-	//krumo($Destacados);	
+	//krumo($Televisions);	
 	if(empty($errores)){
 	$Array2XML= Array2XML::init( '1.0', 'iso-8859-1');
-	$outputDestXML = Array2XML::createXML('Destacados', $Destacados);
+	$outputDestXML = Array2XML::createXML('Televisions', $Television);
 	$xmlString=$outputDestXML->saveXML();
 	$xmlString=utf8_encode($xmlString);
 	
-	$xmlDestinoFile=$_SESSION['workfolder_webdir']."Destacados.xml";
+	$xmlDestinoFile=$_SESSION['workfolder_webdir']."Television.xml";
 	$fp = fopen($xmlDestinoFile, 'w');
 	fwrite($fp, $xmlString);
 	fclose($fp);
@@ -78,20 +83,20 @@ $xml=file_get_contents($xmlDestino);
 //$xml=iconv("UTF-8", "ISO-8859-1//TRANSLIT", $xml);
 // utf8_decode para los caracteres especiales, ñ y demás
 $xml=utf8_decode($xml);
-// cargamos el XML Destacados y lo transformamos en un Array para poder crear el formulario
-$destacadosArray = XML2Array::createArray($xml);
+// cargamos el XML Televisions y lo transformamos en un Array para poder crear el formulario
+$TelevisionsArray = XML2Array::createArray($xml);
 
 
-$formulario = buildDestacadosForm($destacadosArray);
+$formulario = buildTelevisionsForm($TelevisionsArray);
 
-//krumo($destacadosArray);
+//krumo($TelevisionsArray);
 
-// http://cruzroja.vivocomtech.net/Destacados.xml
+// http://cruzroja.vivocomtech.net/Televisions.xml
 
 // construir formulario
-function buildDestacadosForm($xmlArray){
+function buildTelevisionsForm($xmlArray){
 //krumo($xmlArray);
-$baseNode=$xmlArray['Destacados']['Destacado'];
+$baseNode=$xmlArray['Televisions']['Television'];
 //krumo(count($baseNode));
 	$form = new PhpFormBuilder();
 	$form->set_att('enctype', 'multipart/form-data');
@@ -116,7 +121,18 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		'value' =>count($baseNode)
 		)
 		);
-
+		
+		$form->add_input('Elid', array(
+		'wrap_class' => array('form_field_wrap  elid'),
+		'label'=>"El id?",
+		'class'=>array("form-control elid"),
+		'type' => 'hidden',
+		'value' => $value['Elid'],
+		'name'=>'Elid[]'
+		),
+		'Elid_'.$count
+		);
+		
 
 		$form->add_input('ID', array(
 		'wrap_class' => array('form_field_wrap id inline'),
@@ -142,12 +158,14 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		$form->add_input('Texto', array(
 		'wrap_class' => array('form_field_wrap texto'),
 		'class'=>array("form-control texto"),
-		'type' => 'textarea',
+		'type' => 'textfield',
 		'value' => htmlspecialchars_decode($value['Texto']),
 		'name'=>'Texto[]'
 		),
 		'Texto_'.$count
 		);
+		
+		
 		$form->add_input('Enlace', array(
 		'wrap_class' => array('form_field_wrap enlace'),
 		'class'=>array("form-control enlace"),
@@ -157,20 +175,24 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 		),
 		'Enlace_'.$count
 		);
-		$form->add_input('TextoEnlace', array(
-		'wrap_class' => array('form_field_wrap textoenlace'),
-		'label'=>"Posibles imágenes para botón - TextoEnlace",
-		'class'=>array("form-control textoenlace"),
+		
+		// $_SESSION['workfolder
+		
+		$form->add_input('Fecha', array(
+		'wrap_class' => array('form_field_wrap fecha inline'),
+		'label'=>"Fecha <a href='#' class='fechahoy' style='font-size:0.6em'> > Hoy</a>",
+		'class'=>array("form-control fecha"),
 		'type' => 'textfield',
-		'value' => $value['TextoEnlace'],
-		'name'=>'TextoEnlace[]'
+		'value' => $value['Fecha'],
+		'name'=>'Fecha[]'
 		),
-		'TextoEnlace_'.$count
+		'Fecha_'.$count
 		);
+		
 		
 		$form->add_input('Imagen', array(
 		'wrap_class' => array('form_field_wrap'),
-		'label'=>"Imagen destacado",
+		'label'=>"Imagen Television",
 		'class'=>array("form-control imagen"),
 		'type' => 'textfield',
 		'value' => $value['Imagen'],
@@ -200,21 +222,23 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 
 
 <?php
+// krumo($_SESSION);
 // imagenes en la carpeta 
 function translatePathToRelIMG($imgpath){
     // krumo($imgpath);
-	 $newPath =  @explode("/web/",$imgpath)[1];
+	 $newPath =  explode("/web/",$imgpath)[1];
 	 return $newPath;
     }
 // pintamos las imágenes disponibles
-$images=@findFiles($_SESSION['destacados_img_folder'], $ext=array("png","gif","jpg"));
-$_SESSION['folderimages']=$images;
+$images=findFiles($_SESSION['cruzrojatv_img_folder'], $ext=array("png","gif","jpg"));
+
+$_SESSION['cruztv_folderimages']=$images;
 
 $availableImgs="";
 		foreach($images as $path){
 		$relPath=translatePathToRelIMG($path);
-			$availableImgs.= "<div  style='width:200px;display: inline-block;margin:0 10px'>";
-			$availableImgs.="<a class='destthumb' href='#' data-relimg-url='{$relPath}' data-img-url='{$path}'><img  width='200' height='auto' src='{$path}' /></a>"; 
+			$availableImgs.= "<div  style='width:164px;display: inline-block;margin:0 10px'>";
+			$availableImgs.="<a class='destthumb' href='#' data-relimg-url='{$relPath}' data-img-url='{$path}'><img  width='auto' height='auto' src='{$path}' /></a>"; 
 			$availableImgs.= "<div style='word-break:break-all;font-size:11px'>{$path}</div></div>";
 		}
 ?>
@@ -231,13 +255,13 @@ $availableImgs="";
         <script type="text/javascript">
         
         // imagenes en carpeta para ver si la imagen del xml existe en la carpeta o en servidor
-        var imagesinfolder=<?php echo json_encode($_SESSION['folderimages']); ?>;
+        var imagesinfolder=<?php echo json_encode($_SESSION['cruztv_folderimages']); ?>;
         console.log(imagesinfolder);
         
         
         // funcion para escribir url remota a partir del valor del xml si es una imagen existente en servidor, no de las qu ehemos subido
         function estaEnCarpeta(path){
-        // nos llega una url tipo img/destacados/18septiembre14/xxx.jpg
+        // nos llega una url tipo img/Televisions/18septiembre14/xxx.jpg
         // miramos si existe en el array de archivos en carpeta, sino existe es externo (servidor)
 	    //console.log("----"+path);
 	    	for (var i = 0, len = imagesinfolder.length; i < len; i++){
@@ -257,7 +281,7 @@ $availableImgs="";
             
             $(".form-control.textoenlace").after( "<button class='btn btn-primary btn-sm' data-toggle='modal' data-target='#textoEnlaceModal'>Opciones Botones</button>" );
 			
-			/*$(".form-control.imagen").after( "<a class='btn btn-primary btn-sm' target='_blank' href='image_destacados_generator.php'>Ir a imágenes</a>" );*/
+			/*$(".form-control.imagen").after( "<a class='btn btn-primary btn-sm' target='_blank' href='image_Televisions_generator.php'>Ir a imágenes</a>" );*/
 			
 			
 			var accordionPPio = $(".form-control.texto ")
@@ -271,7 +295,7 @@ $availableImgs="";
 			$(".form-control.imagen").after( "<button class='btn btn-primary btn-sm imagePopBt' data-toggle='modal' data-target='#imagesModal'>Imágenes >> </button>" );
 			
 			// container para imagen...
-			$(".form-control.imagen").after( "<img style='cursor:pointer'  href='#imgDetalleModal' data-toggle='modal'  class='thumblink' width='200' height='auto' src=' ' /><div class='textosubimagen'>YUuyuyuy</div>'" );	
+			$(".form-control.imagen").after( "<img style='cursor:pointer'  href='#imgDetalleModal' data-toggle='modal'  class='thumblink' width='164' height='auto' src=' ' /><div class='textosubimagen'>xxx</div>'" );	
 			
 						
 			$('.thumblink').click(function (e) {
@@ -289,8 +313,8 @@ $availableImgs="";
            var encarpeta=estaEnCarpeta($(this).val());
            // console.log(encarpeta);
            if(encarpeta){
-           $(this).next('img').attr("remote-src", "");
            $(this).next('img').attr("src", folderImg);
+           $(this).next('img').attr("remote-src", "");
            $(this).next('img').next('.textosubimagen').text("En carpeta");
            }
            else{
@@ -307,6 +331,12 @@ $availableImgs="";
 
 			$(':submit').addClass("btn btn-success btn-lg");
 			
+			$('.fechahoy').click(function(event){
+			event.preventDefault(); 
+			var inputter=$(this).parent().next(".form-control");
+			inputter.val("<?= $hoyFecha; ?>");
+				//$(this).nextAll();
+			});
 			/*<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
           Collapsible Group Item #2
         </a>*/
@@ -385,11 +415,11 @@ echo $formulario;
       </div>
       <div class="modal-body">
 <pre>Botones cruz roja:
-img/destacados/botonmasinfo.png
-img/destacados/botondonaaqui.png
-img/destacados/botonsaladeprensa.png
-img/destacados/botoncruzrojatv.png
-img/destacados/botonvideo.png	</pre>
+img/Televisions/botonmasinfo.png
+img/Televisions/botondonaaqui.png
+img/Televisions/botonsaladeprensa.png
+img/Televisions/botoncruzrojatv.png
+img/Televisions/botonvideo.png	</pre>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -410,7 +440,7 @@ img/destacados/botonvideo.png	</pre>
         event.preventDefault(); 
         activeSelect=$(this).prevAll(".form-control.imagen").first();
         //$(this).prev(".form-control.imagen").css( "background", "yellow" );
-        $("#availableImgsPop .destthumb").click(function(){
+        $("#availableImgsPop .destthumb").click(function(event){
         	event.preventDefault(); 
 	        activeSelect.val($(this).attr('data-relimg-url'));
 	        activeSelect.change();
@@ -430,7 +460,7 @@ img/destacados/botonvideo.png	</pre>
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">Imágenes Destacados - <?= $_SESSION['workfolder']; ?><a href="image_destacados_generator.php">  >> Ir a imágenes</a></h4>
+        <h4 class="modal-title" id="myModalLabel">Imágenes Televisions - <?= $_SESSION['workfolder']; ?></h4>
       </div>
       <div class="modal-body">
       

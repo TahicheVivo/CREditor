@@ -1,31 +1,39 @@
 <?php
 session_start();
 $root_path = realpath( dirname( __FILE__ ) ) . '/';
-include_once( $root_path . '../libs/Images.php' );
+include_once( $root_path . 'lib/Images.php' );
 include_once( $root_path . '../libs/krumo/class.krumo.php');
 
+$paso1="CR_form1.php";
+
+setlocale(LC_ALL, 'es_ES');
+$todayFolder=$_SESSION['workfolder']?$_SESSION['workfolder']:strftime("%d%B%y");
+
+if(!isset($_SESSION['workfolder_webdir'])){
+	$message = "Necesitas crear carpeta para xml e imágenes <a href='{$paso1}'>Paso 1</a>";
+}
+else{
+//$xmlDestino=$_SESSION['workfolder_webdir']."Destacados.xml";
+$folder=$_SESSION['workfolder_webdir'];
+}
+
+if(!isset($_SESSION['cruzrojatv_img_folder']) || !is_dir($_SESSION['cruzrojatv_img_folder'])){
+$message = "Creando carpeta<br>";
+$cruzrojatv_img_folder=$_SESSION['workfolder_webdir']."img/cruzrojatv/".$todayFolder."/";
+$_SESSION['cruzrojatv_img_folder']=$cruzrojatv_img_folder;
+    //krumo($folder);
+    if (!createPath( $cruzrojatv_img_folder )){
+	    $message = "Error making folder";
+    }
+	$message .= "Carpeta {$cruzrojatv_img_folder} creada";
+	$message .= "<br> {$cruzrojatv_img_folder} es la carpeta activa";
+
+}
 
 
-//for TESTING, we'll create a user_id session
-$_SESSION['user_id']=1;
-if (isset($_SESSION['user_id'])):?>
-
-	<?php
     if($_SERVER['REQUEST_METHOD'] == "POST") {
     
-    $folder="archivo/".$_POST['folder']."/web/img/cruzrojatv/crtv_"; 
-    //krumo($folder);
-    if (!make_folders( $folder )){
-	    echo "Error making folder";
-    }
-    
-   	$images = glob($folder . "{*.jpg,*.gif,*.png}", GLOB_BRACE);
-	echo "<div id='folder_pics' style='background-color:#ccc'>";
-	foreach($images as $path){
-		echo "<img width='auto' height='auto' src='{$path}' />";
-	}
-	echo "</div>";
-    
+     	$folder= $_SESSION['cruzrojatv_img_folder'];     
 		//Upload limit size in megabytes
 		$upload_size_limit = 10;
 		//this is the image destination path
@@ -51,7 +59,7 @@ if (isset($_SESSION['user_id'])):?>
 				//store uploaded image temporarily in "temp" directory while resizing is performed
 				$tmp_img_name = "temp-".time().".".$ext;
 				//create the permanent filename with extension - using time() as filename will ensure a unique filename. Image will be converted to jpg (if it's in another format) so we set it to jpg here.
-				$final_img_name = $final_image_name.".png";
+				$final_img_name = url_slug($final_image_name).".png";
 				
 				//set image thumbnail destination
 				$store_filename = $root_path.$path.$final_img_name;
@@ -119,6 +127,30 @@ if (isset($_SESSION['user_id'])):?>
 			$message=  "Invalid file format. Images must be in jpg, png, gif, or bmp format."; 
 		}
     }
+    
+    
+     function translatePathToRelIMG($imgpath){
+    // krumo($imgpath);
+	 $newPath =  explode("/web/",$imgpath)[1];
+	 return $newPath;
+    }
+    // en Images.pgp
+    // $images=readImagesFolder();
+    //krumo($images);
+    // pintamos las imágenes disponibles
+    $images=findFiles($_SESSION['cruzrojatv_img_folder'], $ext=array("png","gif","jpg"));
+    //krumo($images);
+		$availableImgs="";
+		foreach($images as $path){
+		$relPath=translatePathToRelIMG($path);
+		
+			$availableImgs.= "<div style='width:164px;display: inline-block;margin:0 10px'>";
+			$availableImgs.="<a class='destthumb' href='#imgModal' data-toggle='modal' data-relimg-url='{$relPath}' data-img-url='{$path}'><img  width='auto' height='auto' src='{$path}' /></a>"; 
+			$availableImgs.= "<div style='word-break:break-all;font-size:11px'>{$path}</div></div>";
+		}
+
+
+
     ?>
     
     <!doctype html>
@@ -126,10 +158,9 @@ if (isset($_SESSION['user_id'])):?>
     <head>
         <meta charset="utf-8">
         <title>Upload Image</title>
-        <link href="inc/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<script src="inc/bootstrap/js/bootstrap.min.js"></script>
+       <?php include("header.php") ?>
+       
 
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script type="text/javascript">
         jQuery(document).ready(function($){
             $("#uploading").hide();
@@ -146,21 +177,32 @@ if (isset($_SESSION['user_id'])):?>
     </head>
     
     <body>
-        <?php if (isset($message)):?>
-            <p><?php echo $message;?></p>
-        <?php endif;?>
+       
         
         <?php
         // variables para el form
         setlocale(LC_ALL, 'es_ES');
         $todayFolder=strftime("%d%B%y");
         ?>
-        <div class="container" >
+         <div class="container" >
+<div class="page-header">
+<h1>Editor Cruz Roja - Imágenes CruzrojaTV</h1>
+<?php if (!empty($message)):?>
+<div class="alert alert-warning" role="alert"><?php echo $message; ?></div>
+<?php endif ;?>
+</div>
+
+<?php if (!empty($availableImgs)):?>
+<div class="alert " role="alert"><?php echo $availableImgs; ?></div>
+<?php endif ;?>
+
         <form id="imageform" method="post" enctype="multipart/form-data" action='#'>
+        
         <div class="row">
-        <label for="submit-folder">Nombre de carpeta:</label>
-        <input type="text" name="folder" id="submit-folder"  value="<?= $todayFolder; ?>"/>
+        <label for="submit-folder">Nombre de carpeta:<?=$_SESSION['cruzrojatv_img_folder']?></label>
+        
         </div>
+        
         <div class="row">
         	<h2>CruzrojaTV</h2>
             <label for="submit-img">Upload an image:</label>
@@ -172,4 +214,3 @@ if (isset($_SESSION['user_id'])):?>
         </div>
     </body>
     </html>
-<?php endif;?>
