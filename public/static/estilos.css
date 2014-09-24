@@ -1,3 +1,11 @@
+@media (min-width: 992px)
+.modal-lg
+{
+    width: 900px;
+    height: 900px; /* control height here */
+}
+
+
 submit{
 	
 }
@@ -41,10 +49,11 @@ box-shadow:         -1px 0px 8px 0px rgba(0, 0, 0, 0.47);
 box-shadow:         inset -1px 0px 8px 0px rgba(0, 0, 0, 0.1);
 	        }
 	        h4.colapsa a{
-		        color: #333;
-		        display: block;
-		        width: 100%;
-		        padding: 5px;
+		        color: #7C7C7C;
+				display: block;
+				width: 100%;
+				padding: 5px;
+				font-size: 0.6em;		        
 		    }
 		      
 	        .form_field_wrap.inline label, .form_field_wrap.inline select, .form_field_wrap.inline textarea, .form_field_wrap.inline input {
@@ -71,4 +80,30 @@ right: 10px;
 	font-size: 0.9em !important;
 	height: auto;
 	width: auto;
+}
+
+
+
+#externalModal .modal-dialog {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin:0 auto;
+}
+#externalModal .modal-content {    
+      height: 100%;
+      border-radius: 0;
+      color:white;
+      overflow:auto;
+}
+#externalModal .modal-body{
+	height: 80%;
+overflow-y: scroll;
+}
+
+element.style {
+position: absolute;
+bottom: 0;
+right: 0;
+width: 100%;
 }

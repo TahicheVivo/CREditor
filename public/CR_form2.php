@@ -12,6 +12,7 @@ $remoteURL = "http://cruzroja.vivocomtech.net";
 
 $message="";
 $nextPaso="CR_form2.php";
+$paso1="CR_form1.php";
 // variables para el form
 setlocale(LC_ALL, 'es_ES');
 
@@ -73,16 +74,19 @@ $json = json_encode($xml);
 $XMLarray = json_decode($json,TRUE);
 krumo($XMLarray);*/
 
-$xml=file_get_contents($xmlDestino);
+$xml=@file_get_contents($xmlDestino);
 // por lo visto es mejor iconv si el texto puede contener caracteres como € que no estan en utf_decode
 //$xml=iconv("UTF-8", "ISO-8859-1//TRANSLIT", $xml);
+if($xml){
 // utf8_decode para los caracteres especiales, ñ y demás
 $xml=utf8_decode($xml);
 // cargamos el XML Destacados y lo transformamos en un Array para poder crear el formulario
 $destacadosArray = XML2Array::createArray($xml);
-
-
 $formulario = buildDestacadosForm($destacadosArray);
+}
+else{
+	$message = "No se encuentra el XML {$xmlDestino} <a href='{$paso1}'>Paso 1</a>";
+}
 
 //krumo($destacadosArray);
 
@@ -199,26 +203,6 @@ $baseNode=$xmlArray['Destacados']['Destacado'];
 ?>
 
 
-<?php
-// imagenes en la carpeta 
-function translatePathToRelIMG($imgpath){
-    // krumo($imgpath);
-	 $newPath =  @explode("/web/",$imgpath)[1];
-	 return $newPath;
-    }
-// pintamos las imágenes disponibles
-$images=@findFiles($_SESSION['destacados_img_folder'], $ext=array("png","gif","jpg"));
-$_SESSION['folderimages']=$images;
-
-$availableImgs="";
-		foreach($images as $path){
-		$relPath=translatePathToRelIMG($path);
-			$availableImgs.= "<div  style='width:200px;display: inline-block;margin:0 10px'>";
-			$availableImgs.="<a class='destthumb' href='#' data-relimg-url='{$relPath}' data-img-url='{$path}'><img  width='200' height='auto' src='{$path}' /></a>"; 
-			$availableImgs.= "<div style='word-break:break-all;font-size:11px'>{$path}</div></div>";
-		}
-?>
-
 
  <!doctype html>
     <html >
@@ -226,12 +210,15 @@ $availableImgs="";
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
         <title>CruzRoja XML Paso2</title>
 
-		<?php include("header.php") ?>
+		<?php include("includes/header.php") ?>
 		
         <script type="text/javascript">
         
         // imagenes en carpeta para ver si la imagen del xml existe en la carpeta o en servidor
-        var imagesinfolder=<?php echo json_encode($_SESSION['folderimages']); ?>;
+        var imagesinfolder=<?php 
+        $imgs=isset($_SESSION['destacados_folderimages'])?$_SESSION['destacados_folderimages']:"";
+        echo json_encode($imgs); 
+        ?>;
         console.log(imagesinfolder);
         
         
@@ -260,18 +247,12 @@ $availableImgs="";
 			/*$(".form-control.imagen").after( "<a class='btn btn-primary btn-sm' target='_blank' href='image_destacados_generator.php'>Ir a imágenes</a>" );*/
 			
 			
-			var accordionPPio = $(".form-control.texto ")
-			.closest( ".form_field_wrap" );
-			
-			accordionPPio.each(function(i) {
-				$(this).before('<h4 class="colapsa"><a data-toggle="collapse" data-target="#collapse'+i+'"><span class="glyphicon glyphicon-circle-arrow-down"></span></a></h4>');
-				$(this).nextAll().andSelf().slice( 0,4 ).wrapAll('<div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"></div></div>');
-			});
-			
-			$(".form-control.imagen").after( "<button class='btn btn-primary btn-sm imagePopBt' data-toggle='modal' data-target='#imagesModal'>Imágenes >> </button>" );
+			$(".form-control.imagen").after("<button class='btn btn-primary btn-sm imagePopBt external' href='image_destacados_generator.php'>Imágenes >> </button>" );
+						
+			//$(".form-control.imagen").after( "<button class='btn btn-primary btn-sm imagePopBt' data-toggle='modal' data-target='#imagesModal'>Imágenes >> </button>" );
 			
 			// container para imagen...
-			$(".form-control.imagen").after( "<img style='cursor:pointer'  href='#imgDetalleModal' data-toggle='modal'  class='thumblink' width='200' height='auto' src=' ' /><div class='textosubimagen'>YUuyuyuy</div>'" );	
+			$(".form-control.imagen").after( "<img style='cursor:pointer'  href='#imgDetalleModal' data-toggle='modal'  class='thumblink' width='200' height='auto' src=' ' /><div class='textosubimagen'>YUuyuyuy</div>" );	
 			
 						
 			$('.thumblink').click(function (e) {
@@ -316,6 +297,10 @@ $availableImgs="";
 			Launch demo modal
 			</button>
 			*/
+			// actualizo funciones de behave.js una vez creados elementos
+			
+			
+			imgPopBots();
         });
         </script>
         
@@ -353,7 +338,7 @@ $availableImgs="";
 
 <div class="container" >
 <div class="page-header">
-<h2>Paso 2 - Editar XML</h2>
+<h2>Paso 2 - Destacados - Editar XML</h2>
 <div id="info">
 Carpeta:<?= $_SESSION['workfolder']; ?><br>
 XML: <?= $xmlDestino; ?>
@@ -367,7 +352,7 @@ XML: <?= $xmlDestino; ?>
 <div id="sortableform">
 <?php
 // generado por funcion antes
-echo $formulario;
+if(isset($formulario)) echo $formulario;
 ?>
 </div> 
              
@@ -423,48 +408,8 @@ img/destacados/botonvideo.png	</pre>
         })
 </script>
 
-<!-- modal botones texto enlace -->
-<!-- Modal -->
-<div class="modal fade" id="imagesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">Imágenes Destacados - <?= $_SESSION['workfolder']; ?><a href="image_destacados_generator.php">  >> Ir a imágenes</a></h4>
-      </div>
-      <div class="modal-body">
-      
-      <div  id='availableImgsPop'>
-<?= $availableImgs; ?>
-      </div>
-      
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
+<?php include("includes/modals.php") ?>
 
-
-
-<!-- Modal -->
-<div class="modal fade" id="imgDetalleModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog"  style="width:1020px;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">Titulo Imagen</h4>
-      </div>
-      <div class="modal-body">
-<img src="">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 
     </body>

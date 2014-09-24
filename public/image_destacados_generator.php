@@ -17,10 +17,9 @@ else{
 $folder=$_SESSION['workfolder_webdir'];
 }
 
-if(!isset($_SESSION['destacados_img_folder']) || !is_dir($_SESSION['destacados_img_folder'])){
-$message = "Creando carpeta<br>";
 $destacados_img_folder=$_SESSION['workfolder_webdir']."img/destacados/".$todayFolder."/";
-$_SESSION['destacados_img_folder']=$destacados_img_folder;
+if(!is_dir($destacados_img_folder)){
+$message = "Creando carpeta<br>";
     //krumo($folder);
     if (!createPath( $destacados_img_folder )){
 	    $message = "Error making folder";
@@ -29,6 +28,8 @@ $_SESSION['destacados_img_folder']=$destacados_img_folder;
 	$message .= "<br> {$destacados_img_folder} es la carpeta activa";
 
 }
+$_SESSION['destacados_img_folder']=$destacados_img_folder;
+
 
 if(isset($_GET['delete'])){
 	//unset($_SESSION);
@@ -131,10 +132,12 @@ if(isset($_GET['delete'])){
 		$relPath=translatePathToRelIMG($path);
 		$deletepath=$_SERVER['PHP_SELF']."?delete=".$path;
 		
-			$availableImgs.= "<div style='width:200px;display: inline-block;margin:0 10px'>";
+			$availableImgs.= "<div class='popupImgs' style='width:200px;display: inline-block;margin:0 10px'>";
 			$availableImgs.="<a class='destthumb' href='#imgModal' data-toggle='modal' data-relimg-url='{$relPath}' data-img-url='{$path}'><img  width='200' height='auto' src='{$path}' /></a>"; 
 			$availableImgs.= "<div style='word-break:break-all;font-size:11px'>{$path}</div><a href='{$deletepath}'  onclick='return confirm(\"Borrar Imagen?\")'><span class='glyphicon glyphicon-remove ' style='color:red'></span></a></div>";
 		}
+	
+	$_SESSION['destacados_folderimages']=$images;
     
     ?>
     
@@ -144,8 +147,27 @@ if(isset($_GET['delete'])){
         <meta charset="utf-8">
         <title>Upload Image</title>
 		
-		<?php include("header.php") ?>
+		<?php include("includes/header.php") ?>
         
+        <?php
+        // si estamos un popup modificamos display, pasamos el desde el opener
+      if(isset($_GET['popup']) && $_GET['popup']):?>
+      <style>
+	    .navbar{
+			display: none;
+			}
+		.page-header  { margin: -20px 0 20px;} 
+        </style>
+      <?php endif; ?>  
+      
+      <script> 
+	   // las imagenes presentes en esta carpeta, para usar luego en jquery
+	   var imagesinfolder=<?php echo json_encode($_SESSION['destacados_folderimages']); ?>;
+	   
+	   var isPopUp=<?php echo isset($_GET['popup'])?'true':'false';?>;
+	   
+	   </script>
+
         <script type="text/javascript">
         jQuery(document).ready(function($){
             $("#uploading").hide();
@@ -163,18 +185,7 @@ if(isset($_GET['delete'])){
         });
         
         
-        function centerModal() {
-			$(this).css('display', 'block');
-			var $dialog = $(this).find(".modal-dialog");
-			var offset = ($(window).height() - $dialog.height()) / 2;
-			// Center modal vertically in window
-			$dialog.css("margin-top", offset);
-			}
-
-			$('.modal').on('show.bs.modal', centerModal);
-			$(window).on("resize", function () {
-			$('.modal:visible').each(centerModal);
-				});
+        
 
         </script>
         <style>

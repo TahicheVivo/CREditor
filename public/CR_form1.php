@@ -107,7 +107,7 @@ fclose($fp);
         <meta charset="utf-8">
         <title>CruzRoja XML</title>
 		
-		<?php include("header.php") ?>
+		<?php include("includes/header.php") ?> 
 
         <script type="text/javascript">
         jQuery(document).ready(function($){

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Televisions noNamespaceSchemaLocation="Televisions.xsd">
+  <Television id="1">
+    <id>1</id>
+    <Titulo>Acompañamiento hacia el empleo</Titulo>
+    <Texto>Ayuda a desempleados</Texto>
+    <Imagen>img/cruzrojatv/22septiembre14/24783d75af3429345f99c4735a4637526937cb.png</Imagen>
+    <Enlace>http://www.cruzroja.tv?video=6846</Enlace>
+    <Elid>1</Elid>
+    <Fecha>2014.09.12</Fecha>
+  </Television>
+  <Television id="2">
+    <id>2</id>
+    <Titulo>Jóvenes activos</Titulo>
+    <Texto>Comprometidos con la infancia</Texto>
+    <Imagen>img/cruzrojatv/22septiembre14/0141f450b1a0a49f04dd091570ac606b3644f1.png</Imagen>
+    <Enlace>http://www.cruzroja.tv?video=6806</Enlace>
+    <Elid>1</Elid>
+    <Fecha>2014.09.12</Fecha>
+  </Television>
+  <Television id="3">
+    <id>3</id>
+    <Titulo>#CruzRoja150</Titulo>
+    <Texto>¡Tú eres el relevo!</Texto>
+    <Imagen>img/cruzrojatv/22septiembre14/aa96306cf9c409f7bd6e3c3daef3125bc11b09.png</Imagen>
+    <Enlace>http://www.cruzroja.tv?video=6755</Enlace>
+    <Elid>1</Elid>
+    <Fecha>2014.09.12</Fecha>
+  </Television>
+</Televisions>

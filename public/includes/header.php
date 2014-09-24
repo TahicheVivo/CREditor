@@ -3,13 +3,15 @@ if(isset($_GET['borrar_sesion'])){
 	unset($_SESSION);
 	header("Location:".$_SERVER['PHP_SELF']);
 }
+
 ?>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-        <link href="inc/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<script src="inc/bootstrap/js/bootstrap.min.js"></script>
-		<script src="inc/jquery-ui/jquery-ui.js"></script>
-		<link href="inc/jquery-ui/jquery-ui.css" rel="stylesheet"> 
-		<link href="estilos.css" rel="stylesheet"> 
+        <link href="static/inc/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<script src="static/inc/bootstrap/js/bootstrap.min.js"></script>
+		<script src="static/inc/jquery-ui/jquery-ui.js"></script>
+		<link href="static/inc/jquery-ui/jquery-ui.css" rel="stylesheet"> 
+		<link href="static/estilos.css" rel="stylesheet"> 
+		<script src="static/behave.js"></script>
 		
 <nav class="navbar navbar-default " role="navigation">
   <div class="container-fluid">

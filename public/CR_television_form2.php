@@ -1,5 +1,8 @@
 <?php
 session_start();
+// Notificar solamente errores de ejecución
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
+
 $root_path = realpath( dirname( __FILE__ ) ) . '/';
 include_once( $root_path . '../libs/krumo/class.krumo.php');
 include_once ($root_path . '../libs/Array2XML.php');
@@ -11,7 +14,7 @@ include_once( $root_path . 'lib/Images.php' );
 $remoteURL = "http://cruzroja.vivocomtech.net";
 
 $message="";
-$nextPaso="CR_form2.php";
+$prevPaso="CR_television_form1.php";
 // variables para el form
 setlocale(LC_ALL, 'es_ES');
 $hoyFecha=strftime("%Y.%m.%d");
@@ -51,7 +54,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST"  && isset($_POST['id']) ){
 		$TelevisionArrForm[]=$nodo;
 		//krumo($nodo);
 	}
-	krumo($TelevisionArrForm);
+	//krumo($TelevisionArrForm);
 	$Television=array(
 	"Televisions"=>array(
 	"Television"=>$TelevisionArrForm,
@@ -78,7 +81,11 @@ $json = json_encode($xml);
 $XMLarray = json_decode($json,TRUE);
 krumo($XMLarray);*/
 
-$xml=file_get_contents($xmlDestino);
+$xml=@file_get_contents($xmlDestino);
+if(!$xml){
+$message="NO existe {$xmlDestino} --> <a href='{$prevPaso}'>Crear</a>";	
+}
+else{
 // por lo visto es mejor iconv si el texto puede contener caracteres como € que no estan en utf_decode
 //$xml=iconv("UTF-8", "ISO-8859-1//TRANSLIT", $xml);
 // utf8_decode para los caracteres especiales, ñ y demás
@@ -88,6 +95,8 @@ $TelevisionsArray = XML2Array::createArray($xml);
 
 
 $formulario = buildTelevisionsForm($TelevisionsArray);
+
+}
 
 //krumo($TelevisionsArray);
 
@@ -224,7 +233,7 @@ $baseNode=$xmlArray['Televisions']['Television'];
 <?php
 // krumo($_SESSION);
 // imagenes en la carpeta 
-function translatePathToRelIMG($imgpath){
+/*function translatePathToRelIMG($imgpath){
     // krumo($imgpath);
 	 $newPath =  explode("/web/",$imgpath)[1];
 	 return $newPath;
@@ -240,7 +249,7 @@ $availableImgs="";
 			$availableImgs.= "<div  style='width:164px;display: inline-block;margin:0 10px'>";
 			$availableImgs.="<a class='destthumb' href='#' data-relimg-url='{$relPath}' data-img-url='{$path}'><img  width='auto' height='auto' src='{$path}' /></a>"; 
 			$availableImgs.= "<div style='word-break:break-all;font-size:11px'>{$path}</div></div>";
-		}
+		}*/
 ?>
 
 
@@ -250,13 +259,14 @@ $availableImgs="";
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
         <title>CruzRoja XML Paso2</title>
 
-		<?php include("header.php") ?>
+		<?php include("includes/header.php") ?>
 		
         <script type="text/javascript">
         
         // imagenes en carpeta para ver si la imagen del xml existe en la carpeta o en servidor
         var imagesinfolder=<?php echo json_encode($_SESSION['cruztv_folderimages']); ?>;
-        console.log(imagesinfolder);
+        
+        //console.log(imagesinfolder);
         
         
         // funcion para escribir url remota a partir del valor del xml si es una imagen existente en servidor, no de las qu ehemos subido
@@ -284,18 +294,14 @@ $availableImgs="";
 			/*$(".form-control.imagen").after( "<a class='btn btn-primary btn-sm' target='_blank' href='image_Televisions_generator.php'>Ir a imágenes</a>" );*/
 			
 			
-			var accordionPPio = $(".form-control.texto ")
-			.closest( ".form_field_wrap" );
 			
-			accordionPPio.each(function(i) {
-				$(this).before('<h4 class="colapsa"><a data-toggle="collapse" data-target="#collapse'+i+'"><span class="glyphicon glyphicon-circle-arrow-down"></span></a></h4>');
-				$(this).nextAll().andSelf().slice( 0,4 ).wrapAll('<div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"></div></div>');
-			});
 			
-			$(".form-control.imagen").after( "<button class='btn btn-primary btn-sm imagePopBt' data-toggle='modal' data-target='#imagesModal'>Imágenes >> </button>" );
+			$(".form-control.imagen").after("<button class='btn btn-primary btn-sm imagePopBt external' href='image_thumb_generator.php'>Imágenes >> </button>" );
+			
+			 // $(".form-control.imagen").after( "<button class='btn btn-primary btn-sm imagePopBt' data-toggle='modal' data-target='#imagesModal' >Imágenes OLD >> </button>" );
 			
 			// container para imagen...
-			$(".form-control.imagen").after( "<img style='cursor:pointer'  href='#imgDetalleModal' data-toggle='modal'  class='thumblink' width='164' height='auto' src=' ' /><div class='textosubimagen'>xxx</div>'" );	
+			$(".form-control.imagen").after( "<img style='cursor:pointer'  href='#imgDetalleModal' data-toggle='modal'  class='thumblink' width='164' height='auto' src=' ' /><div class='textosubimagen'>xxx</div>" );	
 			
 						
 			$('.thumblink').click(function (e) {
@@ -309,6 +315,7 @@ $availableImgs="";
 			
 					
 			$(".form-control.imagen").on('input change',function(){
+			//alert('input change');
            var folderImg="<?php echo $_SESSION['workfolder_webdir'] ?>"+$(this).val();
            var encarpeta=estaEnCarpeta($(this).val());
            // console.log(encarpeta);
@@ -346,6 +353,8 @@ $availableImgs="";
 			Launch demo modal
 			</button>
 			*/
+			// update acciones con elementos creados
+			imgPopBots();
         });
         </script>
         
@@ -452,49 +461,10 @@ img/Televisions/botonvideo.png	</pre>
         
         })
 </script>
+<a  href="image_thumb_generator.php" class="external"  >Launch demo modal!!</a>
 
-<!-- modal botones texto enlace -->
-<!-- Modal -->
-<div class="modal fade" id="imagesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">Imágenes Televisions - <?= $_SESSION['workfolder']; ?></h4>
-      </div>
-      <div class="modal-body">
-      
-      <div  id='availableImgsPop'>
-<?= $availableImgs; ?>
-      </div>
-      
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
+<?php include("includes/modals.php") ?>
 
-
-
-<!-- Modal -->
-<div class="modal fade" id="imgDetalleModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog"  style="width:1020px;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="myModalLabel">Titulo Imagen</h4>
-      </div>
-      <div class="modal-body">
-<img src="">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 
     </body>

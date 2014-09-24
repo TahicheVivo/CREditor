@@ -16,20 +16,19 @@ else{
 //$xmlDestino=$_SESSION['workfolder_webdir']."Destacados.xml";
 $folder=$_SESSION['workfolder_webdir'];
 }
-
-if(!isset($_SESSION['cruzrojatv_img_folder']) || !is_dir($_SESSION['cruzrojatv_img_folder'])){
-$message = "Creando carpeta<br>";
 $cruzrojatv_img_folder=$_SESSION['workfolder_webdir']."img/cruzrojatv/".$todayFolder."/";
-$_SESSION['cruzrojatv_img_folder']=$cruzrojatv_img_folder;
+
+if(!is_dir($cruzrojatv_img_folder)){
+$message = "Creando carpeta<br>";
     //krumo($folder);
     if (!createPath( $cruzrojatv_img_folder )){
 	    $message = "Error making folder";
     }
 	$message .= "Carpeta {$cruzrojatv_img_folder} creada";
 	$message .= "<br> {$cruzrojatv_img_folder} es la carpeta activa";
-
 }
 
+$_SESSION['cruzrojatv_img_folder']=$cruzrojatv_img_folder;
 
     if($_SERVER['REQUEST_METHOD'] == "POST") {
     
@@ -146,10 +145,11 @@ $_SESSION['cruzrojatv_img_folder']=$cruzrojatv_img_folder;
 		
 			$availableImgs.= "<div style='width:164px;display: inline-block;margin:0 10px'>";
 			$availableImgs.="<a class='destthumb' href='#imgModal' data-toggle='modal' data-relimg-url='{$relPath}' data-img-url='{$path}'><img  width='auto' height='auto' src='{$path}' /></a>"; 
+			
 			$availableImgs.= "<div style='word-break:break-all;font-size:11px'>{$path}</div></div>";
 		}
 
-
+	$_SESSION['cruztv_folderimages']=$images;	
 
     ?>
     
@@ -158,9 +158,26 @@ $_SESSION['cruzrojatv_img_folder']=$cruzrojatv_img_folder;
     <head>
         <meta charset="utf-8">
         <title>Upload Image</title>
-       <?php include("header.php") ?>
-       
-
+        
+      <?php include("includes/header.php"); ?>
+      <?php 
+      // si estamos un popup modificamos display, pasamos el desde el opener
+      if(isset($_GET['popup']) && $_GET['popup']):?>
+      <style>
+	    .navbar{
+			display: none;
+			}
+		.page-header  { margin: -20px 0 20px;} 
+        </style>
+      <?php endif; ?>  
+      
+	   <script> 
+	   // las imagenes presentes en esta carpeta, para usar luego en jquery
+	   var imagesinfolder=<?php echo json_encode($_SESSION['cruztv_folderimages']); ?>;
+	    var isPopUp=<?php echo isset($_GET['popup'])?'true':'false';?>;
+	    
+	   </script>
+	    
         <script type="text/javascript">
         jQuery(document).ready(function($){
             $("#uploading").hide();
@@ -170,10 +187,9 @@ $_SESSION['cruzrojatv_img_folder']=$cruzrojatv_img_folder;
                 $("#imageform").submit();
             });
         });
+        
         </script>
-        <style>
-	        
-        </style>
+        
     </head>
     
     <body>
@@ -186,14 +202,14 @@ $_SESSION['cruzrojatv_img_folder']=$cruzrojatv_img_folder;
         ?>
          <div class="container" >
 <div class="page-header">
-<h1>Editor Cruz Roja - Imágenes CruzrojaTV</h1>
+<h3>Editor Cruz Roja - Imágenes CruzrojaTV</h3>
 <?php if (!empty($message)):?>
 <div class="alert alert-warning" role="alert"><?php echo $message; ?></div>
 <?php endif ;?>
 </div>
 
 <?php if (!empty($availableImgs)):?>
-<div class="alert " role="alert"><?php echo $availableImgs; ?></div>
+<div class="alert <?php if(isset($_GET['popup']) && $_GET['popup']) echo "popupImgs"; ?>" role="alert"><?php echo $availableImgs; ?></div>
 <?php endif ;?>
 
         <form id="imageform" method="post" enctype="multipart/form-data" action='#'>
